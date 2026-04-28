@@ -3,6 +3,6 @@
   "compilerOptions": {
     "types": ["jest"]
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "src/constants/travel-data.js", "src/navigation/AppNavigator.jsx", "App.jsx", "src/screens/ProfileScreen.jsx", "src/screens/HomeScreen.jsx", "src/components/FloatingNav.jsx"],
   "exclude": ["**/node_modules", "**/Pods"]
 }
