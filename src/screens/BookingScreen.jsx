@@ -10,44 +10,94 @@ import {
   Pressable,
   View,
   useColorScheme,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Modal,
   ActivityIndicator,
 } from 'react-native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LIGHT_THEME, DARK_THEME, PLACES } from '../constants/travel-data';
+import { useToast } from 'react-native-toast-notifications';
 
 const PLACE_SUGGESTIONS = {
-  '1': {
+  1: {
     city: 'Rome',
-    activities: ['Historical Tours', 'Museum Visits', 'Local Cuisine', 'Photography'],
-    hotels: ['Hotel Artemide', 'Colonna Palace', 'Artemide Hotel', 'Golden House'],
+    activities: [
+      'Historical Tours',
+      'Museum Visits',
+      'Local Cuisine',
+      'Photography',
+    ],
+    hotels: [
+      'Hotel Artemide',
+      'Colonna Palace',
+      'Artemide Hotel',
+      'Golden House',
+    ],
     attractions: ['Roman Forum', 'Vatican City', 'Pantheon', 'Trevi Fountain'],
-    packages: ['3-Day Rome Explorer', '5-Day History Tour', 'Romantic Rome Getaway'],
+    packages: [
+      '3-Day Rome Explorer',
+      '5-Day History Tour',
+      'Romantic Rome Getaway',
+    ],
     bestTime: 'April - May, September - October',
     avgDuration: '3-4 hours',
     difficulty: 'Easy',
   },
-  '2': {
+  2: {
     city: 'East Java',
     activities: ['Hiking', 'Sunrise Trekking', 'Photography', 'Nature Walks'],
-    hotels: ['Bromo View Hotel', 'Cemoro Lawang Resort', 'Mount Bromo Hotel', 'Sunrise Point Lodge'],
-    attractions: ['Crater Rim Trek', 'Sunrise Point', 'Sand Sea', 'Tengger Villages'],
-    packages: ['2-Day Bromo Adventure', '3-Day Mountain Tour', 'Sunrise Hiking Package'],
+    hotels: [
+      'Bromo View Hotel',
+      'Cemoro Lawang Resort',
+      'Mount Bromo Hotel',
+      'Sunrise Point Lodge',
+    ],
+    attractions: [
+      'Crater Rim Trek',
+      'Sunrise Point',
+      'Sand Sea',
+      'Tengger Villages',
+    ],
+    packages: [
+      '2-Day Bromo Adventure',
+      '3-Day Mountain Tour',
+      'Sunrise Hiking Package',
+    ],
     bestTime: 'April - October',
     avgDuration: '2-3 days',
     difficulty: 'Moderate',
   },
-  '3': {
+  3: {
     city: 'Cyclades',
-    activities: ['Sunset Viewing', 'Beach Relaxation', 'Wine Tasting', 'Island Hopping'],
-    hotels: ['Astra Suites', 'Chromata', 'Santozeum', 'Mystique Luxury Collection'],
-    attractions: ['Caldera View', 'Blue Dome Churches', 'Volcanic Beaches', 'Local Vineyards'],
-    packages: ['5-Day Romantic Escape', 'Greek Island Hopper', '7-Day Santorini Dream'],
+    activities: [
+      'Sunset Viewing',
+      'Beach Relaxation',
+      'Wine Tasting',
+      'Island Hopping',
+    ],
+    hotels: [
+      'Astra Suites',
+      'Chromata',
+      'Santozeum',
+      'Mystique Luxury Collection',
+    ],
+    attractions: [
+      'Caldera View',
+      'Blue Dome Churches',
+      'Volcanic Beaches',
+      'Local Vineyards',
+    ],
+    packages: [
+      '5-Day Romantic Escape',
+      'Greek Island Hopper',
+      '7-Day Santorini Dream',
+    ],
     bestTime: 'May - September',
     avgDuration: '3-5 days',
     difficulty: 'Easy',
@@ -60,18 +110,19 @@ const TEST_CREDENTIALS = {
     number: '4242 4242 4242 4242',
     expiry: '12/26',
     cvv: '123',
-    name: 'TEST USER'
+    name: 'TEST USER',
   },
   upi: 'test@okhdfcbank',
   netbanking: {
     bank: 'SBI',
     username: 'testuser',
-    password: 'test123'
+    password: 'test123',
   },
-  paypal: 'test@paypal.com'
+  paypal: 'test@paypal.com',
 };
 
 export default function BookingScreen({ navigation, route }) {
+  const toast = useToast(); // Add this line
   const isDark = useColorScheme() === 'dark';
   const colors = isDark ? DARK_THEME : LIGHT_THEME;
   const { placeId, placeName, price } = route.params;
@@ -120,11 +171,14 @@ export default function BookingScreen({ navigation, route }) {
   };
 
   // Handle multi-select for activities
-  const toggleActivity = (activity) => {
+  const toggleActivity = activity => {
     setFormData(prev => {
       const current = prev.selectedActivities;
       if (current.includes(activity)) {
-        return { ...prev, selectedActivities: current.filter(a => a !== activity) };
+        return {
+          ...prev,
+          selectedActivities: current.filter(a => a !== activity),
+        };
       } else {
         return { ...prev, selectedActivities: [...current, activity] };
       }
@@ -132,11 +186,14 @@ export default function BookingScreen({ navigation, route }) {
   };
 
   // Handle multi-select for attractions
-  const toggleAttraction = (attraction) => {
+  const toggleAttraction = attraction => {
     setFormData(prev => {
       const current = prev.selectedAttractions;
       if (current.includes(attraction)) {
-        return { ...prev, selectedAttractions: current.filter(a => a !== attraction) };
+        return {
+          ...prev,
+          selectedAttractions: current.filter(a => a !== attraction),
+        };
       } else {
         return { ...prev, selectedAttractions: [...current, attraction] };
       }
@@ -145,27 +202,47 @@ export default function BookingScreen({ navigation, route }) {
 
   const validateForm = () => {
     if (!formData.firstName.trim()) {
-      Alert.alert('Validation Error', 'Please enter your first name');
+      toast.show('Please enter your first name', {
+        type: 'danger',
+        placement: 'top',
+        duration: 3000,
+        animationType: 'slide-in',
+      });
       return false;
     }
     if (!formData.lastName.trim()) {
-      Alert.alert('Validation Error', 'Please enter your last name');
+       toast.show('Please enter your last name', {
+        type: 'danger',
+        placement: 'top',
+      });
       return false;
     }
     if (!formData.email.trim() || !formData.email.includes('@')) {
-      Alert.alert('Validation Error', 'Please enter a valid email address');
+      toast.show('Please enter a valid email address', {
+        type: 'danger',
+        placement: 'top',
+      });
       return false;
     }
     if (!formData.phone.trim()) {
-      Alert.alert('Validation Error', 'Please enter your phone number');
+      toast.show('Please enter your phone number', {
+        type: 'danger',
+        placement: 'top',
+      });
       return false;
     }
     if (!formData.checkInDate.trim()) {
-      Alert.alert('Validation Error', 'Please enter check-in date (DD/MM/YYYY)');
+      toast.show('Please enter check-in date (DD/MM/YYYY)', {
+        type: 'danger',
+        placement: 'top',
+      });
       return false;
     }
     if (!formData.checkOutDate.trim()) {
-      Alert.alert('Validation Error', 'Please enter check-out date (DD/MM/YYYY)');
+      toast.show('Please enter check-out date (DD/MM/YYYY)', {
+        type: 'danger',
+        placement: 'top',
+      });
       return false;
     }
     return true;
@@ -174,34 +251,106 @@ export default function BookingScreen({ navigation, route }) {
   const validatePayment = () => {
     if (paymentMethod === 'card') {
       if (!paymentDetails.cardNumber.replace(/\s/g, '').match(/^\d{16}$/)) {
-        Alert.alert('Validation Error', 'Please enter valid 16-digit card number');
+        toast.show('Please enter valid 16-digit card number', {
+          type: 'danger',
+          placement: 'top',
+        });
         return false;
       }
       if (!paymentDetails.cardExpiry.match(/^\d{2}\/\d{2}$/)) {
-        Alert.alert('Validation Error', 'Please enter valid expiry date (MM/YY)');
+        toast.show('Please enter valid expiry date (MM/YY)', {
+          type: 'danger',
+          placement: 'top',
+        });
         return false;
       }
       if (!paymentDetails.cardCvv.match(/^\d{3,4}$/)) {
-        Alert.alert('Validation Error', 'Please enter valid CVV');
+        toast.show('Please enter valid CVV', {
+          type: 'danger',
+          placement: 'top',
+        });
         return false;
       }
       if (!paymentDetails.cardName.trim()) {
-        Alert.alert('Validation Error', 'Please enter cardholder name');
+        toast.show('Please enter cardholder name', {
+          type: 'danger',
+          placement: 'top',
+        });
         return false;
       }
     } else if (paymentMethod === 'upi') {
       if (!paymentDetails.upiId.includes('@')) {
-        Alert.alert('Validation Error', 'Please enter valid UPI ID');
+        toast.show('Please enter valid UPI ID', {
+          type: 'danger',
+          placement: 'top',
+        });
         return false;
       }
     } else if (paymentMethod === 'netbanking') {
-      if (!paymentDetails.netbankingUsername.trim() || !paymentDetails.netbankingPassword.trim()) {
-        Alert.alert('Validation Error', 'Please enter netbanking credentials');
+      if (
+        !paymentDetails.netbankingUsername.trim() ||
+        !paymentDetails.netbankingPassword.trim()
+      ) {
+        toast.show('Please enter netbanking credentials', {
+          type: 'danger',
+          placement: 'top',
+        });
         return false;
       }
     } else if (paymentMethod === 'paypal') {
       if (!paymentDetails.paypalEmail.includes('@')) {
-        Alert.alert('Validation Error', 'Please enter valid PayPal email');
+        toast.show('Please enter valid PayPal email', {
+          type: 'danger',
+          placement: 'top',
+        });
+        return false;
+      }
+      if (!paymentDetails.cardExpiry.match(/^\d{2}\/\d{2}$/)) {
+        toast.show('Please enter valid expiry date (MM/YY)', {
+          type: 'danger',
+          placement: 'top',
+        });
+        return false;
+      }
+      if (!paymentDetails.cardCvv.match(/^\d{3,4}$/)) {
+        toast.show('Please enter valid CVV', {
+          type: 'danger',
+          placement: 'top',
+        });
+        return false;
+      }
+      if (!paymentDetails.cardName.trim()) {
+        toast.show('Please enter cardholder name', {
+          type: 'danger',
+          placement: 'top',
+        });
+        return false;
+      }
+    } else if (paymentMethod === 'upi') {
+      if (!paymentDetails.upiId.includes('@')) {
+        toast.show('Please enter valid UPI ID', {
+          type: 'danger',
+          placement: 'top',
+        });
+        return false;
+      }
+    } else if (paymentMethod === 'netbanking') {
+      if (
+        !paymentDetails.netbankingUsername.trim() ||
+        !paymentDetails.netbankingPassword.trim()
+      ) {
+        toast.show('Please enter netbanking credentials', {
+          type: 'danger',
+          placement: 'top',
+        });
+        return false;
+      }
+    } else if (paymentMethod === 'paypal') {
+      if (!paymentDetails.paypalEmail.includes('@')) {
+        toast.show('Please enter valid PayPal email', {
+          type: 'danger',
+          placement: 'top',
+        });
         return false;
       }
     }
@@ -218,7 +367,10 @@ export default function BookingScreen({ navigation, route }) {
       setShowPaymentModal(false);
       setShowSuccessModal(true);
     } catch (error) {
-      Alert.alert('Payment Failed', 'Please try again');
+      toast.show('Payment Failed', {
+        type: 'danger',
+        placement: 'top',
+      });
       setPaymentProcessing(false);
     }
   };
@@ -228,16 +380,24 @@ export default function BookingScreen({ navigation, route }) {
     setShowPaymentModal(true);
   };
 
-  const handleSuccessAction = (action) => {
+  const handleSuccessAction = action => {
     setShowSuccessModal(false);
     if (action === 'home') {
       navigation.popToTop();
       navigation.navigate('MainTabs', { screen: 'Home' });
     } else if (action === 'download') {
       // Simulate download
-      Alert.alert('Download Started', 'Your booking confirmation is being downloaded');
-    } else if (action === 'view') {
-      Alert.alert('Booking Details', `Booking confirmed for ${placeName}\nGuests: ${formData.guests}\nDates: ${formData.checkInDate} - ${formData.checkOutDate}`);
+      toast.show('Download Started', {
+        type: 'info',
+        placement: 'top',
+      });
+    } else if (action === 'view') {     
+      toast.show('Booking Details',
+      `Booking confirmed for ${placeName}\nGuests: ${formData.guests}\nDates: ${formData.checkInDate} - ${formData.checkOutDate}`
+      , {
+        type: 'success',
+        placement: 'top',
+      });
     }
   };
 
@@ -261,48 +421,87 @@ export default function BookingScreen({ navigation, route }) {
           showsVerticalScrollIndicator={false}
         >
           {/* Header Card */}
-          <View style={[styles.headerCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.placeName, { color: colors.primaryText }]}>{placeName}</Text>
+          <View
+            style={[
+              styles.headerCard,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.placeName, { color: colors.primaryText }]}>
+              {placeName}
+            </Text>
             <View style={styles.locationRow}>
               <Icon name="location-on" size={wp('4%')} color={colors.accent} />
-              <Text style={[styles.locationText, { color: colors.secondaryText }]}>{suggestions.city}</Text>
+              <Text
+                style={[styles.locationText, { color: colors.secondaryText }]}
+              >
+                {suggestions.city}
+              </Text>
             </View>
             <View style={styles.priceRow}>
-              <Text style={[styles.priceLabel, { color: colors.secondaryText }]}>Per Person:</Text>
-              <Text style={[styles.basePrice, { color: colors.accent }]}>{price}</Text>
+              <Text
+                style={[styles.priceLabel, { color: colors.secondaryText }]}
+              >
+                Per Person:
+              </Text>
+              <Text style={[styles.basePrice, { color: colors.accent }]}>
+                {price}
+              </Text>
             </View>
           </View>
 
           {/* Quick Info */}
-          <View style={[styles.quickInfo, { backgroundColor: colors.softSurface }]}>
+          <View
+            style={[styles.quickInfo, { backgroundColor: colors.softSurface }]}
+          >
             <View style={styles.infoItem}>
               <Icon name="schedule" size={wp('4%')} color={colors.accent} />
               <View style={styles.infoTextContainer}>
-                <Text style={[styles.infoLabel, { color: colors.secondaryText }]}>Duration</Text>
-                <Text style={[styles.infoValue, { color: colors.primaryText }]}>{suggestions.avgDuration}</Text>
+                <Text
+                  style={[styles.infoLabel, { color: colors.secondaryText }]}
+                >
+                  Duration
+                </Text>
+                <Text style={[styles.infoValue, { color: colors.primaryText }]}>
+                  {suggestions.avgDuration}
+                </Text>
               </View>
             </View>
             <View style={styles.infoDivider} />
             <View style={styles.infoItem}>
               <Icon name="trending-up" size={wp('4%')} color={colors.accent} />
               <View style={styles.infoTextContainer}>
-                <Text style={[styles.infoLabel, { color: colors.secondaryText }]}>Difficulty</Text>
-                <Text style={[styles.infoValue, { color: colors.primaryText }]}>{suggestions.difficulty}</Text>
+                <Text
+                  style={[styles.infoLabel, { color: colors.secondaryText }]}
+                >
+                  Difficulty
+                </Text>
+                <Text style={[styles.infoValue, { color: colors.primaryText }]}>
+                  {suggestions.difficulty}
+                </Text>
               </View>
             </View>
             <View style={styles.infoDivider} />
             <View style={styles.infoItem}>
               <Icon name="event-note" size={wp('4%')} color={colors.accent} />
               <View style={styles.infoTextContainer}>
-                <Text style={[styles.infoLabel, { color: colors.secondaryText }]}>Best Time</Text>
-                <Text style={[styles.infoValue, { color: colors.primaryText }]}>{suggestions.bestTime.split(',')[0]}</Text>
+                <Text
+                  style={[styles.infoLabel, { color: colors.secondaryText }]}
+                >
+                  Best Time
+                </Text>
+                <Text style={[styles.infoValue, { color: colors.primaryText }]}>
+                  {suggestions.bestTime.split(',')[0]}
+                </Text>
               </View>
             </View>
           </View>
 
           {/* Hotels */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>Recommended Hotels</Text>
+            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>
+              Recommended Hotels
+            </Text>
             <View style={styles.suggestionGrid}>
               {suggestions.hotels.map((hotel, index) => (
                 <Pressable
@@ -310,23 +509,40 @@ export default function BookingScreen({ navigation, route }) {
                   style={[
                     styles.suggestionChip,
                     {
-                      backgroundColor: formData.selectedHotel === hotel ? colors.accent : colors.softSurface,
-                      borderColor: formData.selectedHotel === hotel ? colors.accent : colors.border,
+                      backgroundColor:
+                        formData.selectedHotel === hotel
+                          ? colors.accent
+                          : colors.softSurface,
+                      borderColor:
+                        formData.selectedHotel === hotel
+                          ? colors.accent
+                          : colors.border,
                     },
                   ]}
-                  onPress={() => handleInputChange('selectedHotel', formData.selectedHotel === hotel ? null : hotel)}
+                  onPress={() =>
+                    handleInputChange(
+                      'selectedHotel',
+                      formData.selectedHotel === hotel ? null : hotel,
+                    )
+                  }
                 >
-                  <Icon 
-                    name="home" 
-                    size={wp('4%')} 
-                    color={formData.selectedHotel === hotel ? '#fff' : colors.accent} 
+                  <Icon
+                    name="home"
+                    size={wp('4%')}
+                    color={
+                      formData.selectedHotel === hotel ? '#fff' : colors.accent
+                    }
                   />
                   <Text
                     style={[
                       styles.suggestionText,
                       {
-                        color: formData.selectedHotel === hotel ? '#fff' : colors.primaryText,
-                        fontWeight: formData.selectedHotel === hotel ? '700' : '600',
+                        color:
+                          formData.selectedHotel === hotel
+                            ? '#fff'
+                            : colors.primaryText,
+                        fontWeight:
+                          formData.selectedHotel === hotel ? '700' : '600',
                       },
                     ]}
                   >
@@ -342,7 +558,10 @@ export default function BookingScreen({ navigation, route }) {
             <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>
               Suggested Activities
               {selectedActivitiesCount > 0 && (
-                <Text style={[styles.selectionCount, { color: colors.accent }]}> ({selectedActivitiesCount} selected)</Text>
+                <Text style={[styles.selectionCount, { color: colors.accent }]}>
+                  {' '}
+                  ({selectedActivitiesCount} selected)
+                </Text>
               )}
             </Text>
             <View style={styles.suggestionGrid}>
@@ -352,23 +571,45 @@ export default function BookingScreen({ navigation, route }) {
                   style={[
                     styles.suggestionChip,
                     {
-                      backgroundColor: formData.selectedActivities.includes(activity) ? colors.accent : colors.softSurface,
-                      borderColor: formData.selectedActivities.includes(activity) ? colors.accent : colors.border,
+                      backgroundColor: formData.selectedActivities.includes(
+                        activity,
+                      )
+                        ? colors.accent
+                        : colors.softSurface,
+                      borderColor: formData.selectedActivities.includes(
+                        activity,
+                      )
+                        ? colors.accent
+                        : colors.border,
                     },
                   ]}
                   onPress={() => toggleActivity(activity)}
                 >
-                  <Icon 
-                    name={formData.selectedActivities.includes(activity) ? "check-circle" : "add-circle-outline"} 
-                    size={wp('4%')} 
-                    color={formData.selectedActivities.includes(activity) ? '#fff' : colors.accent} 
+                  <Icon
+                    name={
+                      formData.selectedActivities.includes(activity)
+                        ? 'check-circle'
+                        : 'add-circle-outline'
+                    }
+                    size={wp('4%')}
+                    color={
+                      formData.selectedActivities.includes(activity)
+                        ? '#fff'
+                        : colors.accent
+                    }
                   />
                   <Text
                     style={[
                       styles.suggestionText,
                       {
-                        color: formData.selectedActivities.includes(activity) ? '#fff' : colors.primaryText,
-                        fontWeight: formData.selectedActivities.includes(activity) ? '700' : '600',
+                        color: formData.selectedActivities.includes(activity)
+                          ? '#fff'
+                          : colors.primaryText,
+                        fontWeight: formData.selectedActivities.includes(
+                          activity,
+                        )
+                          ? '700'
+                          : '600',
                       },
                     ]}
                   >
@@ -384,7 +625,10 @@ export default function BookingScreen({ navigation, route }) {
             <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>
               Top Attractions
               {selectedAttractionsCount > 0 && (
-                <Text style={[styles.selectionCount, { color: colors.accent }]}> ({selectedAttractionsCount} selected)</Text>
+                <Text style={[styles.selectionCount, { color: colors.accent }]}>
+                  {' '}
+                  ({selectedAttractionsCount} selected)
+                </Text>
               )}
             </Text>
             <View style={styles.suggestionGrid}>
@@ -394,23 +638,45 @@ export default function BookingScreen({ navigation, route }) {
                   style={[
                     styles.suggestionChip,
                     {
-                      backgroundColor: formData.selectedAttractions.includes(attraction) ? colors.accent : colors.softSurface,
-                      borderColor: formData.selectedAttractions.includes(attraction) ? colors.accent : colors.border,
+                      backgroundColor: formData.selectedAttractions.includes(
+                        attraction,
+                      )
+                        ? colors.accent
+                        : colors.softSurface,
+                      borderColor: formData.selectedAttractions.includes(
+                        attraction,
+                      )
+                        ? colors.accent
+                        : colors.border,
                     },
                   ]}
                   onPress={() => toggleAttraction(attraction)}
                 >
-                  <Icon 
-                    name={formData.selectedAttractions.includes(attraction) ? "check-circle" : "add-circle-outline"} 
-                    size={wp('4%')} 
-                    color={formData.selectedAttractions.includes(attraction) ? '#fff' : colors.accent} 
+                  <Icon
+                    name={
+                      formData.selectedAttractions.includes(attraction)
+                        ? 'check-circle'
+                        : 'add-circle-outline'
+                    }
+                    size={wp('4%')}
+                    color={
+                      formData.selectedAttractions.includes(attraction)
+                        ? '#fff'
+                        : colors.accent
+                    }
                   />
                   <Text
                     style={[
                       styles.suggestionText,
                       {
-                        color: formData.selectedAttractions.includes(attraction) ? '#fff' : colors.primaryText,
-                        fontWeight: formData.selectedAttractions.includes(attraction) ? '700' : '600',
+                        color: formData.selectedAttractions.includes(attraction)
+                          ? '#fff'
+                          : colors.primaryText,
+                        fontWeight: formData.selectedAttractions.includes(
+                          attraction,
+                        )
+                          ? '700'
+                          : '600',
                       },
                     ]}
                   >
@@ -423,7 +689,9 @@ export default function BookingScreen({ navigation, route }) {
 
           {/* Packages */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>Tour Packages</Text>
+            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>
+              Tour Packages
+            </Text>
             <View style={styles.packageList}>
               {suggestions.packages.map((pkg, index) => (
                 <Pressable
@@ -431,23 +699,44 @@ export default function BookingScreen({ navigation, route }) {
                   style={[
                     styles.packageItem,
                     {
-                      backgroundColor: formData.selectedPackage === pkg ? colors.accent : colors.softSurface,
-                      borderColor: formData.selectedPackage === pkg ? colors.accent : colors.border,
+                      backgroundColor:
+                        formData.selectedPackage === pkg
+                          ? colors.accent
+                          : colors.softSurface,
+                      borderColor:
+                        formData.selectedPackage === pkg
+                          ? colors.accent
+                          : colors.border,
                     },
                   ]}
-                  onPress={() => handleInputChange('selectedPackage', formData.selectedPackage === pkg ? null : pkg)}
+                  onPress={() =>
+                    handleInputChange(
+                      'selectedPackage',
+                      formData.selectedPackage === pkg ? null : pkg,
+                    )
+                  }
                 >
-                  <Icon 
-                    name={formData.selectedPackage === pkg ? "check-circle" : "radio-button-unchecked"} 
-                    size={wp('5%')} 
-                    color={formData.selectedPackage === pkg ? '#fff' : colors.accent} 
+                  <Icon
+                    name={
+                      formData.selectedPackage === pkg
+                        ? 'check-circle'
+                        : 'radio-button-unchecked'
+                    }
+                    size={wp('5%')}
+                    color={
+                      formData.selectedPackage === pkg ? '#fff' : colors.accent
+                    }
                   />
                   <Text
                     style={[
                       styles.packageText,
                       {
-                        color: formData.selectedPackage === pkg ? '#fff' : colors.primaryText,
-                        fontWeight: formData.selectedPackage === pkg ? '700' : '600',
+                        color:
+                          formData.selectedPackage === pkg
+                            ? '#fff'
+                            : colors.primaryText,
+                        fontWeight:
+                          formData.selectedPackage === pkg ? '700' : '600',
                       },
                     ]}
                   >
@@ -460,7 +749,9 @@ export default function BookingScreen({ navigation, route }) {
 
           {/* Guest Selection - Small and inline */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>Number of Guests</Text>
+            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>
+              Number of Guests
+            </Text>
             <View style={styles.guestGrid}>
               {guestOptions.map(option => (
                 <Pressable
@@ -468,8 +759,14 @@ export default function BookingScreen({ navigation, route }) {
                   style={[
                     styles.guestButton,
                     {
-                      backgroundColor: formData.guests === option ? colors.accent : colors.softSurface,
-                      borderColor: formData.guests === option ? colors.accent : colors.border,
+                      backgroundColor:
+                        formData.guests === option
+                          ? colors.accent
+                          : colors.softSurface,
+                      borderColor:
+                        formData.guests === option
+                          ? colors.accent
+                          : colors.border,
                     },
                   ]}
                   onPress={() => handleInputChange('guests', option)}
@@ -478,7 +775,10 @@ export default function BookingScreen({ navigation, route }) {
                     style={[
                       styles.guestButtonText,
                       {
-                        color: formData.guests === option ? '#fff' : colors.primaryText,
+                        color:
+                          formData.guests === option
+                            ? '#fff'
+                            : colors.primaryText,
                         fontWeight: formData.guests === option ? '700' : '600',
                       },
                     ]}
@@ -492,10 +792,16 @@ export default function BookingScreen({ navigation, route }) {
 
           {/* Date Selection */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>Travel Dates</Text>
+            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>
+              Travel Dates
+            </Text>
             <View style={styles.dateRow}>
               <View style={styles.dateInputWrapper}>
-                <Text style={[styles.inputLabel, { color: colors.secondaryText }]}>Check-in</Text>
+                <Text
+                  style={[styles.inputLabel, { color: colors.secondaryText }]}
+                >
+                  Check-in
+                </Text>
                 <TextInput
                   style={[
                     styles.dateInput,
@@ -508,11 +814,17 @@ export default function BookingScreen({ navigation, route }) {
                   placeholder="DD/MM/YYYY"
                   placeholderTextColor={colors.mutedText}
                   value={formData.checkInDate}
-                  onChangeText={value => handleInputChange('checkInDate', value)}
+                  onChangeText={value =>
+                    handleInputChange('checkInDate', value)
+                  }
                 />
               </View>
               <View style={styles.dateInputWrapper}>
-                <Text style={[styles.inputLabel, { color: colors.secondaryText }]}>Check-out</Text>
+                <Text
+                  style={[styles.inputLabel, { color: colors.secondaryText }]}
+                >
+                  Check-out
+                </Text>
                 <TextInput
                   style={[
                     styles.dateInput,
@@ -525,7 +837,9 @@ export default function BookingScreen({ navigation, route }) {
                   placeholder="DD/MM/YYYY"
                   placeholderTextColor={colors.mutedText}
                   value={formData.checkOutDate}
-                  onChangeText={value => handleInputChange('checkOutDate', value)}
+                  onChangeText={value =>
+                    handleInputChange('checkOutDate', value)
+                  }
                 />
               </View>
             </View>
@@ -533,10 +847,16 @@ export default function BookingScreen({ navigation, route }) {
 
           {/* Personal Information */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>Your Information</Text>
+            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>
+              Your Information
+            </Text>
             <View style={styles.nameRow}>
               <View style={styles.nameInputWrapper}>
-                <Text style={[styles.inputLabel, { color: colors.secondaryText }]}>First Name</Text>
+                <Text
+                  style={[styles.inputLabel, { color: colors.secondaryText }]}
+                >
+                  First Name
+                </Text>
                 <TextInput
                   style={[
                     styles.input,
@@ -553,7 +873,11 @@ export default function BookingScreen({ navigation, route }) {
                 />
               </View>
               <View style={styles.nameInputWrapper}>
-                <Text style={[styles.inputLabel, { color: colors.secondaryText }]}>Last Name</Text>
+                <Text
+                  style={[styles.inputLabel, { color: colors.secondaryText }]}
+                >
+                  Last Name
+                </Text>
                 <TextInput
                   style={[
                     styles.input,
@@ -571,7 +895,9 @@ export default function BookingScreen({ navigation, route }) {
               </View>
             </View>
 
-            <Text style={[styles.inputLabel, { color: colors.secondaryText }]}>Email Address</Text>
+            <Text style={[styles.inputLabel, { color: colors.secondaryText }]}>
+              Email Address
+            </Text>
             <TextInput
               style={[
                 styles.input,
@@ -588,7 +914,12 @@ export default function BookingScreen({ navigation, route }) {
               onChangeText={value => handleInputChange('email', value)}
             />
 
-            <Text style={[styles.inputLabel, { color: colors.secondaryText, marginTop: hp('1.5%') }]}>
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: colors.secondaryText, marginTop: hp('1.5%') },
+              ]}
+            >
               Phone Number
             </Text>
             <TextInput
@@ -610,7 +941,9 @@ export default function BookingScreen({ navigation, route }) {
 
           {/* Special Requests */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>Special Requests (Optional)</Text>
+            <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>
+              Special Requests (Optional)
+            </Text>
             <TextInput
               style={[
                 styles.textArea,
@@ -625,30 +958,56 @@ export default function BookingScreen({ navigation, route }) {
               multiline
               numberOfLines={3}
               value={formData.specialRequests}
-              onChangeText={value => handleInputChange('specialRequests', value)}
+              onChangeText={value =>
+                handleInputChange('specialRequests', value)
+              }
               textAlignVertical="top"
             />
           </View>
 
           {/* Price Breakdown */}
-          <View style={[styles.priceBreakdown, { backgroundColor: colors.softSurface, borderColor: colors.border }]}>
-            <Text style={[styles.breakdownTitle, { color: colors.primaryText }]}>Price Breakdown</Text>
+          <View
+            style={[
+              styles.priceBreakdown,
+              {
+                backgroundColor: colors.softSurface,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Text
+              style={[styles.breakdownTitle, { color: colors.primaryText }]}
+            >
+              Price Breakdown
+            </Text>
 
             <View style={styles.breakdownRow}>
-              <Text style={[styles.breakdownLabel, { color: colors.secondaryText }]}>
-                {price} × {formData.guests} {formData.guests === '1' ? 'guest' : 'guests'}
+              <Text
+                style={[styles.breakdownLabel, { color: colors.secondaryText }]}
+              >
+                {price} × {formData.guests}{' '}
+                {formData.guests === '1' ? 'guest' : 'guests'}
               </Text>
-              <Text style={[styles.breakdownValue, { color: colors.primaryText }]}>
+              <Text
+                style={[styles.breakdownValue, { color: colors.primaryText }]}
+              >
                 ${estimatedTotal}
               </Text>
             </View>
 
             {selectedActivitiesCount > 0 && (
               <View style={styles.breakdownRow}>
-                <Text style={[styles.breakdownLabel, { color: colors.secondaryText }]}>
+                <Text
+                  style={[
+                    styles.breakdownLabel,
+                    { color: colors.secondaryText },
+                  ]}
+                >
                   Activities ({selectedActivitiesCount})
                 </Text>
-                <Text style={[styles.breakdownValue, { color: colors.primaryText }]}>
+                <Text
+                  style={[styles.breakdownValue, { color: colors.primaryText }]}
+                >
                   ${selectedActivitiesCount * 15}
                 </Text>
               </View>
@@ -656,19 +1015,41 @@ export default function BookingScreen({ navigation, route }) {
 
             {selectedAttractionsCount > 0 && (
               <View style={styles.breakdownRow}>
-                <Text style={[styles.breakdownLabel, { color: colors.secondaryText }]}>
+                <Text
+                  style={[
+                    styles.breakdownLabel,
+                    { color: colors.secondaryText },
+                  ]}
+                >
                   Attractions ({selectedAttractionsCount})
                 </Text>
-                <Text style={[styles.breakdownValue, { color: colors.primaryText }]}>
+                <Text
+                  style={[styles.breakdownValue, { color: colors.primaryText }]}
+                >
                   ${selectedAttractionsCount * 10}
                 </Text>
               </View>
             )}
 
-            <View style={[styles.breakdownRow, { borderTopColor: colors.border, borderTopWidth: 1, paddingTop: hp('1%'), marginTop: hp('1%') }]}>
-              <Text style={[styles.totalLabel, { color: colors.primaryText }]}>Total Price</Text>
+            <View
+              style={[
+                styles.breakdownRow,
+                {
+                  borderTopColor: colors.border,
+                  borderTopWidth: 1,
+                  paddingTop: hp('1%'),
+                  marginTop: hp('1%'),
+                },
+              ]}
+            >
+              <Text style={[styles.totalLabel, { color: colors.primaryText }]}>
+                Total Price
+              </Text>
               <Text style={[styles.totalPrice, { color: colors.accent }]}>
-                ${estimatedTotal + (selectedActivitiesCount * 15) + (selectedAttractionsCount * 10)}
+                $
+                {estimatedTotal +
+                  selectedActivitiesCount * 15 +
+                  selectedAttractionsCount * 10}
               </Text>
             </View>
           </View>
@@ -676,7 +1057,12 @@ export default function BookingScreen({ navigation, route }) {
       </KeyboardAvoidingView>
 
       {/* Booking Button */}
-      <View style={[styles.bookingFooter, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+      <View
+        style={[
+          styles.bookingFooter,
+          { backgroundColor: colors.surface, borderTopColor: colors.border },
+        ]}
+      >
         <Pressable
           style={[styles.bookButton, { backgroundColor: colors.accent }]}
           onPress={handleBooking}
@@ -694,16 +1080,29 @@ export default function BookingScreen({ navigation, route }) {
         onRequestClose={() => setShowPaymentModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+          <View
+            style={[styles.modalContent, { backgroundColor: colors.surface }]}
+          >
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.primaryText }]}>Payment Details</Text>
+              <Text style={[styles.modalTitle, { color: colors.primaryText }]}>
+                Payment Details
+              </Text>
               <Pressable onPress={() => setShowPaymentModal(false)}>
-                <Icon name="close" size={wp('6%')} color={colors.secondaryText} />
+                <Icon
+                  name="close"
+                  size={wp('6%')}
+                  color={colors.secondaryText}
+                />
               </Pressable>
             </View>
 
-            <Text style={[styles.modalSubtitle, { color: colors.secondaryText }]}>
-              Total Amount: ${estimatedTotal + (selectedActivitiesCount * 15) + (selectedAttractionsCount * 10)}
+            <Text
+              style={[styles.modalSubtitle, { color: colors.secondaryText }]}
+            >
+              Total Amount: $
+              {estimatedTotal +
+                selectedActivitiesCount * 15 +
+                selectedAttractionsCount * 10}
             </Text>
 
             {/* Payment Method Selection */}
@@ -711,19 +1110,44 @@ export default function BookingScreen({ navigation, route }) {
               {[
                 { id: 'card', name: 'Card', icon: 'credit-card' },
                 { id: 'upi', name: 'UPI', icon: 'qr-code' },
-                { id: 'netbanking', name: 'Net Banking', icon: 'account-balance' },
+                {
+                  id: 'netbanking',
+                  name: 'Net Banking',
+                  icon: 'account-balance',
+                },
                 { id: 'paypal', name: 'PayPal', icon: 'payment' },
               ].map(method => (
                 <Pressable
                   key={method.id}
                   style={[
                     styles.paymentMethodBtn,
-                    { backgroundColor: paymentMethod === method.id ? colors.accent : colors.softSurface },
+                    {
+                      backgroundColor:
+                        paymentMethod === method.id
+                          ? colors.accent
+                          : colors.softSurface,
+                    },
                   ]}
                   onPress={() => setPaymentMethod(method.id)}
                 >
-                  <Icon name={method.icon} size={wp('5%')} color={paymentMethod === method.id ? '#fff' : colors.primaryText} />
-                  <Text style={[styles.paymentMethodText, { color: paymentMethod === method.id ? '#fff' : colors.primaryText }]}>
+                  <Icon
+                    name={method.icon}
+                    size={wp('5%')}
+                    color={
+                      paymentMethod === method.id ? '#fff' : colors.primaryText
+                    }
+                  />
+                  <Text
+                    style={[
+                      styles.paymentMethodText,
+                      {
+                        color:
+                          paymentMethod === method.id
+                            ? '#fff'
+                            : colors.primaryText,
+                      },
+                    ]}
+                  >
                     {method.name}
                   </Text>
                 </Pressable>
@@ -731,13 +1155,25 @@ export default function BookingScreen({ navigation, route }) {
             </View>
 
             {/* Test Credentials Info */}
-            <View style={[styles.testCredentials, { backgroundColor: colors.softSurface }]}>
+            <View
+              style={[
+                styles.testCredentials,
+                { backgroundColor: colors.softSurface },
+              ]}
+            >
               <Icon name="info" size={wp('4%')} color={colors.accent} />
-              <Text style={[styles.testCredentialsText, { color: colors.secondaryText }]}>
+              <Text
+                style={[
+                  styles.testCredentialsText,
+                  { color: colors.secondaryText },
+                ]}
+              >
                 Test Credentials:
               </Text>
             </View>
-            <Text style={[styles.testCredsDetails, { color: colors.mutedText }]}>
+            <Text
+              style={[styles.testCredsDetails, { color: colors.mutedText }]}
+            >
               Card: 4242 4242 4242 4242 | Exp: 12/26 | CVV: 123
               {'\n'}UPI: test@okhdfcbank
               {'\n'}NetBanking: testuser / test123
@@ -745,105 +1181,219 @@ export default function BookingScreen({ navigation, route }) {
             </Text>
 
             {/* Payment Forms */}
-            <ScrollView style={styles.paymentForm} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={styles.paymentForm}
+              showsVerticalScrollIndicator={false}
+            >
               {paymentMethod === 'card' && (
                 <View>
                   <TextInput
-                    style={[styles.paymentInput, { backgroundColor: colors.softSurface, borderColor: colors.border, color: colors.primaryText }]}
+                    style={[
+                      styles.paymentInput,
+                      {
+                        backgroundColor: colors.softSurface,
+                        borderColor: colors.border,
+                        color: colors.primaryText,
+                      },
+                    ]}
                     placeholder="Card Number"
                     placeholderTextColor={colors.mutedText}
                     keyboardType="numeric"
                     value={paymentDetails.cardNumber}
-                    onChangeText={(text) => {
+                    onChangeText={text => {
                       let cleaned = text.replace(/\s/g, '');
-                      let formatted = cleaned.match(/.{1,4}/g)?.join(' ') || cleaned;
-                      setPaymentDetails({ ...paymentDetails, cardNumber: formatted });
+                      let formatted =
+                        cleaned.match(/.{1,4}/g)?.join(' ') || cleaned;
+                      setPaymentDetails({
+                        ...paymentDetails,
+                        cardNumber: formatted,
+                      });
                     }}
                     maxLength={19}
                   />
                   <View style={styles.rowInputs}>
                     <TextInput
-                      style={[styles.halfInput, { backgroundColor: colors.softSurface, borderColor: colors.border, color: colors.primaryText }]}
+                      style={[
+                        styles.halfInput,
+                        {
+                          backgroundColor: colors.softSurface,
+                          borderColor: colors.border,
+                          color: colors.primaryText,
+                        },
+                      ]}
                       placeholder="MM/YY"
                       placeholderTextColor={colors.mutedText}
                       value={paymentDetails.cardExpiry}
-                      onChangeText={(text) => setPaymentDetails({ ...paymentDetails, cardExpiry: text })}
+                      onChangeText={text =>
+                        setPaymentDetails({
+                          ...paymentDetails,
+                          cardExpiry: text,
+                        })
+                      }
                       maxLength={5}
                     />
                     <TextInput
-                      style={[styles.halfInput, { backgroundColor: colors.softSurface, borderColor: colors.border, color: colors.primaryText }]}
+                      style={[
+                        styles.halfInput,
+                        {
+                          backgroundColor: colors.softSurface,
+                          borderColor: colors.border,
+                          color: colors.primaryText,
+                        },
+                      ]}
                       placeholder="CVV"
                       placeholderTextColor={colors.mutedText}
                       keyboardType="numeric"
                       value={paymentDetails.cardCvv}
-                      onChangeText={(text) => setPaymentDetails({ ...paymentDetails, cardCvv: text })}
+                      onChangeText={text =>
+                        setPaymentDetails({ ...paymentDetails, cardCvv: text })
+                      }
                       maxLength={4}
                     />
                   </View>
                   <TextInput
-                    style={[styles.paymentInput, { backgroundColor: colors.softSurface, borderColor: colors.border, color: colors.primaryText }]}
+                    style={[
+                      styles.paymentInput,
+                      {
+                        backgroundColor: colors.softSurface,
+                        borderColor: colors.border,
+                        color: colors.primaryText,
+                      },
+                    ]}
                     placeholder="Cardholder Name"
                     placeholderTextColor={colors.mutedText}
                     value={paymentDetails.cardName}
-                    onChangeText={(text) => setPaymentDetails({ ...paymentDetails, cardName: text })}
+                    onChangeText={text =>
+                      setPaymentDetails({ ...paymentDetails, cardName: text })
+                    }
                   />
                 </View>
               )}
 
               {paymentMethod === 'upi' && (
                 <TextInput
-                  style={[styles.paymentInput, { backgroundColor: colors.softSurface, borderColor: colors.border, color: colors.primaryText }]}
+                  style={[
+                    styles.paymentInput,
+                    {
+                      backgroundColor: colors.softSurface,
+                      borderColor: colors.border,
+                      color: colors.primaryText,
+                    },
+                  ]}
                   placeholder="UPI ID (e.g., name@bank)"
                   placeholderTextColor={colors.mutedText}
                   value={paymentDetails.upiId}
-                  onChangeText={(text) => setPaymentDetails({ ...paymentDetails, upiId: text })}
+                  onChangeText={text =>
+                    setPaymentDetails({ ...paymentDetails, upiId: text })
+                  }
                 />
               )}
 
               {paymentMethod === 'netbanking' && (
                 <View>
-                  <View style={[styles.bankSelector, { backgroundColor: colors.softSurface, borderColor: colors.border }]}>
+                  <View
+                    style={[
+                      styles.bankSelector,
+                      {
+                        backgroundColor: colors.softSurface,
+                        borderColor: colors.border,
+                      },
+                    ]}
+                  >
                     {['SBI', 'HDFC', 'ICICI', 'Axis'].map(bank => (
                       <Pressable
                         key={bank}
                         style={[
                           styles.bankOption,
-                          { backgroundColor: paymentDetails.netbankingBank === bank ? colors.accent : 'transparent' },
+                          {
+                            backgroundColor:
+                              paymentDetails.netbankingBank === bank
+                                ? colors.accent
+                                : 'transparent',
+                          },
                         ]}
-                        onPress={() => setPaymentDetails({ ...paymentDetails, netbankingBank: bank })}
+                        onPress={() =>
+                          setPaymentDetails({
+                            ...paymentDetails,
+                            netbankingBank: bank,
+                          })
+                        }
                       >
-                        <Text style={[styles.bankOptionText, { color: paymentDetails.netbankingBank === bank ? '#fff' : colors.primaryText }]}>
+                        <Text
+                          style={[
+                            styles.bankOptionText,
+                            {
+                              color:
+                                paymentDetails.netbankingBank === bank
+                                  ? '#fff'
+                                  : colors.primaryText,
+                            },
+                          ]}
+                        >
                           {bank}
                         </Text>
                       </Pressable>
                     ))}
                   </View>
                   <TextInput
-                    style={[styles.paymentInput, { backgroundColor: colors.softSurface, borderColor: colors.border, color: colors.primaryText }]}
+                    style={[
+                      styles.paymentInput,
+                      {
+                        backgroundColor: colors.softSurface,
+                        borderColor: colors.border,
+                        color: colors.primaryText,
+                      },
+                    ]}
                     placeholder="Username"
                     placeholderTextColor={colors.mutedText}
                     value={paymentDetails.netbankingUsername}
-                    onChangeText={(text) => setPaymentDetails({ ...paymentDetails, netbankingUsername: text })}
+                    onChangeText={text =>
+                      setPaymentDetails({
+                        ...paymentDetails,
+                        netbankingUsername: text,
+                      })
+                    }
                   />
                   <TextInput
-                    style={[styles.paymentInput, { backgroundColor: colors.softSurface, borderColor: colors.border, color: colors.primaryText }]}
+                    style={[
+                      styles.paymentInput,
+                      {
+                        backgroundColor: colors.softSurface,
+                        borderColor: colors.border,
+                        color: colors.primaryText,
+                      },
+                    ]}
                     placeholder="Password"
                     placeholderTextColor={colors.mutedText}
                     secureTextEntry
                     value={paymentDetails.netbankingPassword}
-                    onChangeText={(text) => setPaymentDetails({ ...paymentDetails, netbankingPassword: text })}
+                    onChangeText={text =>
+                      setPaymentDetails({
+                        ...paymentDetails,
+                        netbankingPassword: text,
+                      })
+                    }
                   />
                 </View>
               )}
 
               {paymentMethod === 'paypal' && (
                 <TextInput
-                  style={[styles.paymentInput, { backgroundColor: colors.softSurface, borderColor: colors.border, color: colors.primaryText }]}
+                  style={[
+                    styles.paymentInput,
+                    {
+                      backgroundColor: colors.softSurface,
+                      borderColor: colors.border,
+                      color: colors.primaryText,
+                    },
+                  ]}
                   placeholder="PayPal Email"
                   placeholderTextColor={colors.mutedText}
                   keyboardType="email-address"
                   value={paymentDetails.paypalEmail}
-                  onChangeText={(text) => setPaymentDetails({ ...paymentDetails, paypalEmail: text })}
+                  onChangeText={text =>
+                    setPaymentDetails({ ...paymentDetails, paypalEmail: text })
+                  }
                 />
               )}
             </ScrollView>
@@ -868,24 +1418,31 @@ export default function BookingScreen({ navigation, route }) {
       </Modal>
 
       {/* Success Modal */}
-      <Modal
-        visible={showSuccessModal}
-        animationType="fade"
-        transparent={true}
-      >
+      <Modal visible={showSuccessModal} animationType="fade" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.successModal, { backgroundColor: colors.surface }]}>
+          <View
+            style={[styles.successModal, { backgroundColor: colors.surface }]}
+          >
             <View style={styles.successIcon}>
-              <Icon name="check-circle" size={wp('15%')} color={colors.success} />
+              <Icon
+                name="check-circle"
+                size={wp('15%')}
+                color={colors.success}
+              />
             </View>
-            <Text style={[styles.successTitle, { color: colors.primaryText }]}>Payment Successful!</Text>
-            <Text style={[styles.successMessage, { color: colors.secondaryText }]}>
+            <Text style={[styles.successTitle, { color: colors.primaryText }]}>
+              Payment Successful!
+            </Text>
+            <Text
+              style={[styles.successMessage, { color: colors.secondaryText }]}
+            >
               Your booking for {placeName} has been confirmed.
             </Text>
             <Text style={[styles.bookingRef, { color: colors.accent }]}>
-              Booking Ref: #{Math.random().toString(36).substr(2, 8).toUpperCase()}
+              Booking Ref: #
+              {Math.random().toString(36).substr(2, 8).toUpperCase()}
             </Text>
-            
+
             <View style={styles.successActions}>
               <Pressable
                 style={[styles.successBtn, { backgroundColor: colors.accent }]}
@@ -894,21 +1451,39 @@ export default function BookingScreen({ navigation, route }) {
                 <Icon name="home" size={wp('4%')} color="#fff" />
                 <Text style={styles.successBtnText}>Go to Home</Text>
               </Pressable>
-              
+
               <Pressable
-                style={[styles.successBtn, { backgroundColor: colors.success, borderColor: colors.border, borderWidth: 1 }]}
+                style={[
+                  styles.successBtn,
+                  {
+                    backgroundColor: colors.success,
+                    borderColor: colors.border,
+                    borderWidth: 1,
+                  },
+                ]}
                 onPress={() => handleSuccessAction('download')}
               >
                 <Icon name="download" size={wp('4%')} color="#fff" />
                 <Text style={styles.successBtnText}>Download Booking</Text>
               </Pressable>
-              
+
               <Pressable
-                style={[styles.successBtn, { backgroundColor: colors.softSurface }]}
+                style={[
+                  styles.successBtn,
+                  { backgroundColor: colors.softSurface },
+                ]}
                 onPress={() => handleSuccessAction('view')}
               >
-                <Icon name="receipt" size={wp('4%')} color={colors.primaryText} />
-                <Text style={[styles.successBtnText, { color: colors.primaryText }]}>View Details</Text>
+                <Icon
+                  name="receipt"
+                  size={wp('4%')}
+                  color={colors.primaryText}
+                />
+                <Text
+                  style={[styles.successBtnText, { color: colors.primaryText }]}
+                >
+                  View Details
+                </Text>
               </Pressable>
             </View>
           </View>

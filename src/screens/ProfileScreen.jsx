@@ -16,10 +16,12 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { USER_DATA, LIGHT_THEME, DARK_THEME } from '../constants/travel-data';
+import { useToast } from 'react-native-toast-notifications';
 
 export default function ProfileScreen() {
   const isDark = useColorScheme() === 'dark';
   const colors = isDark ? DARK_THEME : LIGHT_THEME;
+  const toast = useToast(); // Add this line
 
   const [user, setUser] = useState(USER_DATA);
   const [isEditing, setIsEditing] = useState(false);
@@ -28,7 +30,10 @@ export default function ProfileScreen() {
   const handleEditProfile = () => {
     setIsEditing(!isEditing);
     if (isEditing) {
-      Alert.alert('Success', 'Profile updated successfully!');
+      toast.show('Profile updated successfully!', {
+        type: 'success',
+        placement: 'top',
+      });
     }
   };
 
@@ -41,11 +46,17 @@ export default function ProfileScreen() {
         notifications: value,
       },
     });
-    Alert.alert('Settings', `Notifications ${value ? 'enabled' : 'disabled'}`);
+    toast.show(`Notifications ${value ? 'enabled' : 'disabled'}`, {
+      type: value ? 'success' : 'warning',
+      placement: 'top',
+    });
   };
 
   const handleMenuItemPress = (label) => {
-    Alert.alert(label, `You tapped on ${label}`);
+    toast.show(`You tapped on ${label}`, {
+      type: 'info',
+      placement: 'top',
+    }); 
   };
 
   const handleLogout = () => {
@@ -57,10 +68,16 @@ export default function ProfileScreen() {
         { 
           text: 'Logout', 
           style: 'destructive',
-          onPress: () => Alert.alert('Success', 'Logged out successfully')
+          onPress: () => {
+            toast.show('Logged out successfully', {
+              type: 'success',
+              placement: 'top',
+            });
+          }
         },
       ]
     );
+   
   };
 
   return (

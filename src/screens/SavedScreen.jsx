@@ -9,33 +9,45 @@ import {
   Pressable,
   View,
   useColorScheme,
-  Alert,
 } from 'react-native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { PLACES, LIGHT_THEME, DARK_THEME } from '../constants/travel-data';
+import { useToast } from 'react-native-toast-notifications';
 
 export default function SavedScreen({ navigation }) {
-  const isDark = useColorScheme() === "dark";
+  const isDark = useColorScheme() === 'dark';
   const colors = isDark ? DARK_THEME : LIGHT_THEME;
   const [savedDestinations, setSavedDestinations] = useState(PLACES);
   const [favorites, setFavorites] = useState(PLACES.map(p => p.id));
+  const toast = useToast(); // Add this line
 
   const toggleFavorite = (placeId, placeName) => {
     if (favorites.includes(placeId)) {
       setFavorites(favorites.filter(id => id !== placeId));
       setSavedDestinations(savedDestinations.filter(p => p.id !== placeId));
-      Alert.alert('Removed', `${placeName} removed from saved`);
+      toast.show(`${placeName} removed from saved`, {
+        type: 'danger',
+        placement: 'top',
+        duration: 2000,
+      });
     } else {
       setFavorites([...favorites, placeId]);
-      Alert.alert('Saved', `${placeName} added to saved`);
+      toast.show(`${placeName} added to saved`, {
+        type: 'success',
+        placement: 'top',
+        duration: 2000,
+      });
     }
   };
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.screenBg }]}>
-      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
@@ -48,14 +60,27 @@ export default function SavedScreen({ navigation }) {
 
         {savedDestinations.length === 0 ? (
           <View style={styles.emptyState}>
-            <View style={[styles.emptyIcon, { backgroundColor: colors.softSurface }]}>
-              <Icon name="bookmark-outline" size={wp('15%')} color={colors.mutedText} />
+            <View
+              style={[
+                styles.emptyIcon,
+                { backgroundColor: colors.softSurface },
+              ]}
+            >
+              <Icon
+                name="bookmark-outline"
+                size={wp('15%')}
+                color={colors.mutedText}
+              />
             </View>
-            <Text style={[styles.emptyText, { color: colors.primaryText }]}>No saved places yet</Text>
-            <Text style={[styles.emptySubtext, { color: colors.secondaryText }]}>
+            <Text style={[styles.emptyText, { color: colors.primaryText }]}>
+              No saved places yet
+            </Text>
+            <Text
+              style={[styles.emptySubtext, { color: colors.secondaryText }]}
+            >
               Explore destinations and bookmark your favorites
             </Text>
-            <Pressable 
+            <Pressable
               style={[styles.exploreBtn, { backgroundColor: colors.accent }]}
               onPress={() => navigation.navigate('Explore')}
             >
@@ -64,38 +89,55 @@ export default function SavedScreen({ navigation }) {
             </Pressable>
           </View>
         ) : (
-          savedDestinations.map((place) => (
+          savedDestinations.map(place => (
             <Pressable
               key={place.id}
-              style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
-              onPress={() =>
-                navigation.navigate("Detail", { id: place.id })
-              }
+              style={[
+                styles.card,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+              ]}
+              onPress={() => navigation.navigate('Detail', { id: place.id })}
             >
               <Image source={{ uri: place.image }} style={styles.image} />
               <View style={styles.info}>
                 <View style={{ flex: 1 }}>
-                  <Text style={[styles.name, { color: colors.primaryText }]}>{place.name}</Text>
-                  <Text style={[styles.location, { color: colors.secondaryText }]}>
+                  <Text style={[styles.name, { color: colors.primaryText }]}>
+                    {place.name}
+                  </Text>
+                  <Text
+                    style={[styles.location, { color: colors.secondaryText }]}
+                  >
                     {place.city}, {place.country}
                   </Text>
                   <View style={styles.ratingRow}>
                     <Icon name="star" size={wp('3.5%')} color="#f5ad18" />
-                    <Text style={[styles.rating, { color: colors.primaryText }]}>
+                    <Text
+                      style={[styles.rating, { color: colors.primaryText }]}
+                    >
                       {place.rating}
                     </Text>
                   </View>
                 </View>
                 <View style={styles.rightContent}>
-                  <Text style={[styles.price, { color: colors.accent }]}>{place.price}</Text>
-                  <Pressable 
+                  <Text style={[styles.price, { color: colors.accent }]}>
+                    {place.price}
+                  </Text>
+                  <Pressable
                     style={styles.favButton}
                     onPress={() => toggleFavorite(place.id, place.name)}
                   >
-                    <Icon 
-                      name={favorites.includes(place.id) ? "favorite" : "favorite-border"} 
-                      size={wp('5.5%')} 
-                      color={favorites.includes(place.id) ? colors.danger : colors.secondaryText} 
+                    <Icon
+                      name={
+                        favorites.includes(place.id)
+                          ? 'favorite'
+                          : 'favorite-border'
+                      }
+                      size={wp('5.5%')}
+                      color={
+                        favorites.includes(place.id)
+                          ? colors.danger
+                          : colors.secondaryText
+                      }
                     />
                   </Pressable>
                 </View>
@@ -123,7 +165,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: RFPercentage(4.5),
     lineHeight: RFPercentage(5),
-    fontWeight: "800",
+    fontWeight: '800',
     marginBottom: hp('0.5%'),
   },
   subtitle: {
@@ -131,8 +173,8 @@ const styles = StyleSheet.create({
     marginBottom: hp('2.5%'),
   },
   card: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: wp('3%'),
     padding: wp('3%'),
     borderRadius: wp('3.5%'),
@@ -156,7 +198,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: RFPercentage(2),
-    fontWeight: "700",
+    fontWeight: '700',
     marginBottom: hp('0.3%'),
   },
   location: {
@@ -178,7 +220,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: RFPercentage(1.8),
-    fontWeight: "700",
+    fontWeight: '700',
     marginBottom: hp('1%'),
   },
   favButton: {

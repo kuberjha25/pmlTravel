@@ -1,13 +1,21 @@
 // src/navigation/AppNavigator.jsx
 import React from 'react';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useColorScheme, View, StyleSheet, Image, Text } from 'react-native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LIGHT_THEME, DARK_THEME } from '../constants/travel-data';
+import { ToastProvider } from 'react-native-toast-notifications';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -25,17 +33,26 @@ const Stack = createNativeStackNavigator();
 // Custom Header Component for Home Screen
 function HomeHeader({ colors, isDark }) {
   return (
-    <View style={[styles.headerContainer, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+    <View
+      style={[
+        styles.headerContainer,
+        { backgroundColor: colors.surface, borderBottomColor: colors.border },
+      ]}
+    >
       <View style={styles.headerContent}>
-        <View style={{ alignItems: "flex-start" , justifyContent: "center"}}>
-          <Text style={[styles.headerGreeting, { color: colors.secondaryText }]}>Welcome back</Text>
+        <View style={{ alignItems: 'flex-start', justifyContent: 'center' }}>
+          <Text
+            style={[styles.headerGreeting, { color: colors.secondaryText }]}
+          >
+            Welcome back
+          </Text>
           {/* <Text style={[styles.headerTitle, { color: colors.primaryText }]}>
             Where do{"\n"}
             <Text style={styles.headerTitleStrong}>you want to go?</Text>
           </Text> */}
         </View>
         <Image
-          source={{ uri: "https://i.pravatar.cc/100?img=12" }}
+          source={{ uri: 'https://i.pravatar.cc/100?img=12' }}
           style={styles.headerAvatar}
         />
       </View>
@@ -173,47 +190,62 @@ export default function AppNavigator() {
   };
 
   return (
-    <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="MainTabs"
-          component={TabNavigator}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Detail"
-          component={DetailScreen}
-          options={{
-            ...headerOptions,
-            title: 'Place Details',
-            animation: 'slide_from_right',
-          }}
-        />
-        <Stack.Screen
-          name="Map"
-          component={MapScreen}
-          options={{
-            ...headerOptions,
-            title: 'Map',
-            animation: 'slide_from_right',
-          }}
-        />
-        <Stack.Screen
-          name="Booking"
-          component={BookingScreen}
-          options={{
-            ...headerOptions,
-            title: 'Book Your Trip',
-            animation: 'slide_from_bottom',
-          }}
-        />
-        <Stack.Screen
-          name="Modal"
-          component={ModalScreen}
-          options={{ presentation: 'modal', title: 'Modal' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ToastProvider
+      placement="top"
+      duration={3000}
+      animationType="slide-in"
+      animationDuration={250}
+      successColor="green"
+      dangerColor="red"
+      warningColor="orange"
+      normalColor="gray"
+      textStyle={{ fontSize: 14 }}
+      offsetTop={50}
+      offsetBottom={40}
+      swipeEnabled={true}
+    >
+      <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="MainTabs"
+            component={TabNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Detail"
+            component={DetailScreen}
+            options={{
+              ...headerOptions,
+              title: 'Place Details',
+              animation: 'slide_from_right',
+            }}
+          />
+          <Stack.Screen
+            name="Map"
+            component={MapScreen}
+            options={{
+              ...headerOptions,
+              title: 'Map',
+              animation: 'slide_from_right',
+            }}
+          />
+          <Stack.Screen
+            name="Booking"
+            component={BookingScreen}
+            options={{
+              ...headerOptions,
+              title: 'Book Your Trip',
+              animation: 'slide_from_bottom',
+            }}
+          />
+          <Stack.Screen
+            name="Modal"
+            component={ModalScreen}
+            options={{ presentation: 'modal', title: 'Modal' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ToastProvider>
   );
 }
 
@@ -225,23 +257,23 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerGreeting: {
     fontSize: RFPercentage(3),
-    fontWeight: "500",
+    fontWeight: '500',
     marginBottom: hp('0.3%'),
   },
   headerTitle: {
     fontSize: RFPercentage(4.5),
     lineHeight: RFPercentage(5.5),
-    fontWeight: "500",
+    fontWeight: '500',
     letterSpacing: -0.6,
   },
   headerTitleStrong: {
-    fontWeight: "800",
+    fontWeight: '800',
   },
   headerAvatar: {
     width: wp('12%'),

@@ -8,16 +8,13 @@ import {
   Pressable,
   View,
   useColorScheme,
-  Alert,
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { RFPercentage } from 'react-native-responsive-fontsize';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { WebView } from 'react-native-webview';
 import { PLACES, LIGHT_THEME, DARK_THEME } from '../constants/travel-data';
-import { FloatingNav } from '../components/FloatingNav';
 
 const { width, height } = Dimensions.get('window');
 
@@ -274,7 +271,7 @@ export default function MapScreen({ navigation, route }) {
 
      
       {/* Nearby Places */}
-      <View style={styles.nearbyContainer}>
+      {/* <View style={styles.nearbyContainer}>
         <Text style={[styles.nearbyTitle, { color: colors.primaryText }]}>Nearby Places</Text>
         <View style={styles.nearbyRow}>
           {nearbyPlaces.map((place) => (
@@ -293,7 +290,7 @@ export default function MapScreen({ navigation, route }) {
             </Pressable>
           ))}
         </View>
-      </View>
+      </View> */}
 
       {/* <FloatingNav active="home" onNavigate={(screen) => {
         if (screen === 'Home') {
